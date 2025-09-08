@@ -1,92 +1,222 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ECONOMIA demo</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <style>
-      .text-justify {
-        text-align: justify;
-      }
-    </style>
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg bg-dark">
-        <div class="container-fluid">
-          <a class="navbar-brand text-white" href="index.html">INICIO</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <ul class="navbar-nav">
-              <li class="nav-item">
-                <a class="nav-link text-white" aria-current="page" href="interes_simple.html">INTERES SIMPLE</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="interes_compuesto.html">INTERES COMPUESTO</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="anualidades.html">ANUALIDADES</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="tasas.html">TASAS</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="amortizacion.html">AMORTIZACION</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="vpn.html">VPN</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="van_tir.html">VAN_TIR</a>
-              </li>
-            </ul>
+import React, { useState, useEffect } from 'react';
+import { Thermometer, Droplets, Sun, Monitor, Settings, BarChart3, Activity } from 'lucide-react';
+
+const MonitoringSystem = () => {
+  const [currentScreen, setCurrentScreen] = useState('main');
+  const [data, setData] = useState({
+    temperature: 23.5,
+    humidity: 65.2,
+    radiation: 850.3,
+    timestamp: new Date()
+  });
+
+  // Simular actualización de datos cada 5 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setData(prev => ({
+        temperature: (20 + Math.random() * 10).toFixed(1),
+        humidity: (50 + Math.random() * 30).toFixed(1),
+        radiation: (700 + Math.random() * 400).toFixed(1),
+        timestamp: new Date()
+      }));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const screens = [
+    { id: 'main', name: 'Principal', icon: Monitor },
+    { id: 'charts', name: 'Gráficos', icon: BarChart3 },
+    { id: 'alerts', name: 'Alertas', icon: Activity },
+    { id: 'config', name: 'Configuración', icon: Settings }
+  ];
+
+  const getStatusColor = (value, type) => {
+    if (type === 'temperature') {
+      if (value < 15 || value > 35) return 'text-red-500';
+      if (value < 18 || value > 30) return 'text-yellow-500';
+      return 'text-green-500';
+    }
+    if (type === 'humidity') {
+      if (value < 30 || value > 80) return 'text-red-500';
+      if (value < 40 || value > 70) return 'text-yellow-500';
+      return 'text-green-500';
+    }
+    if (type === 'radiation') {
+      if (value > 1200) return 'text-red-500';
+      if (value > 1000) return 'text-yellow-500';
+      return 'text-green-500';
+    }
+    return 'text-gray-600';
+  };
+
+  const MainScreen = () => (
+    <div className="space-y-8">
+      {/* Variables principales */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Temperatura */}
+        <div className="bg-gradient-to-br from-red-50 to-red-100 border-2 border-red-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-3 bg-red-500 rounded-lg">
+                <Thermometer className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800">Temperatura</h3>
+            </div>
+          </div>
+          <div className="text-center">
+            <div className={`text-4xl font-bold mb-2 ${getStatusColor(data.temperature, 'temperature')}`}>
+              {data.temperature}°C
+            </div>
+            <div className="text-sm text-gray-600">
+              Rango normal: 18-30°C
+            </div>
           </div>
         </div>
-      </nav>
 
-      <div class="container text-center">
-        <div class="row">   
-        <div class="col bg-primary text-white text-justify"> 
-            <h3>INGENIERIA ECONOMIA</h3>
-            <p>
-                La Ingeniería Económica se centra en la evaluación sistemática de las alternativas de solución a problemas de ingeniería, con base en los resultados de modelos económicos financieros como apoyo a la toma de decisiones. La combinación de las matemáticas financieras con la gestión y administración financiera, se convierten en herramientas que soportan el proceso de toma de decisiones económicas en las empresas (o grupos empresariales) por cuanto permite medir, comparar y prospectar las alternativas de inversión con base en los resultados de los indicadores de rentabilidad y de liquidez.
-            </p>
+        {/* Humedad */}
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-3 bg-blue-500 rounded-lg">
+                <Droplets className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800">Humedad Relativa</h3>
+            </div>
+          </div>
+          <div className="text-center">
+            <div className={`text-4xl font-bold mb-2 ${getStatusColor(data.humidity, 'humidity')}`}>
+              {data.humidity}%
+            </div>
+            <div className="text-sm text-gray-600">
+              Rango normal: 40-70%
+            </div>
+          </div>
         </div>
-        <div class="col bg-primary-subtle text-primary-emphasis">
-            <img src="https://finanzaspara.com/wp-content/uploads/2023/09/Que-son-las-finanzas-2.png" alt="imagen contable" width="450" height="350"/>
-        </div>
-        </div>
-    </div>
-    <div class="container text-center">
-      <div class="row align-items-start">
-        <div class="col bg-primary-subtle text-primary-emphasis">
-          <img src="https://static.vecteezy.com/system/resources/previews/002/135/541/large_2x/finance-concept-illustration-business-concept-for-investment-vector.jpg" alt="imagen contable" width="450" height="350"/>
-        </div>
-        <div class="col bg-primary text-white text-justify">
-          <h3>Ingenieria Economica: Aplicaciones</h3>
-          <p>
-            Es extraño, y desde luego muy lamentable, que tantos autores, en sus libros de ingeniería, no le dan importancia o le prestan muy poca atención a los costos, a pesar del hecho de que el primer deber del Ingeniero, es el de tener éstos en cuenta a objeto de obtener una economía real, es decir, lograr que el mayor número posible de dólares y centavos obtengan el óptimo rendimiento financiero.
 
-            La ingeniería económica también se aplica en otras ramas de la ingeniería tales como:
-          </p>
-          <ul>
-            <li>Ingeniería Civil</li>
-            <li>Ingeniería Eléctrica</li>
-            <li>Ingeniería Mecánica</li>
-            <li>Ingeniería Química</li>
-            <li>Ingeniería en Electrónica</li>
-            <li>Ingeniería Agrícola</li>
-            <li>Arquitectura</li>
-          </ul>
+        {/* Radiación Solar */}
+        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="p-3 bg-yellow-500 rounded-lg">
+                <Sun className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-800">Radiación Solar</h3>
+            </div>
+          </div>
+          <div className="text-center">
+            <div className={`text-4xl font-bold mb-2 ${getStatusColor(data.radiation, 'radiation')}`}>
+              {data.radiation}
+            </div>
+            <div className="text-xs text-gray-600 mb-1">W/m²</div>
+            <div className="text-sm text-gray-600">
+              Máximo seguro: 1000 W/m²
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Panel de información adicional */}
+      <div className="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-lg">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Estado del Sistema</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+            <span className="text-gray-700">Última actualización:</span>
+            <span className="font-semibold text-gray-900">
+              {data.timestamp.toLocaleTimeString()}
+            </span>
+          </div>
+          <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+            <span className="text-gray-700">Estado general:</span>
+            <span className="font-semibold text-green-600">NORMAL</span>
+          </div>
         </div>
       </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-  </body>
-</html>
+  );
 
+  const OtherScreen = ({ screenName }) => (
+    <div className="flex items-center justify-center h-96 bg-gray-100 rounded-xl border-2 border-gray-200">
+      <div className="text-center">
+        <div className="text-6xl text-gray-400 mb-4">🚧</div>
+        <h2 className="text-2xl font-semibold text-gray-700 mb-2">
+          Pantalla de {screenName}
+        </h2>
+        <p className="text-gray-600">
+          Esta pantalla está en desarrollo
+        </p>
+      </div>
+    </div>
+  );
 
-   
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header superior con variables */}
+      <div className="bg-white shadow-md border-b-2 border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-800">Sistema de Monitoreo</h1>
+            
+            {/* Variables en el header */}
+            <div className="flex space-x-6">
+              <div className="flex items-center space-x-2">
+                <Thermometer className="w-5 h-5 text-red-500" />
+                <span className="text-sm font-medium text-gray-700">
+                  {data.temperature}°C
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Droplets className="w-5 h-5 text-blue-500" />
+                <span className="text-sm font-medium text-gray-700">
+                  {data.humidity}%
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Sun className="w-5 h-5 text-yellow-500" />
+                <span className="text-sm font-medium text-gray-700">
+                  {data.radiation} W/m²
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto p-4 flex gap-6">
+        {/* Contenido principal */}
+        <div className="flex-1">
+          {currentScreen === 'main' && <MainScreen />}
+          {currentScreen === 'charts' && <OtherScreen screenName="Gráficos" />}
+          {currentScreen === 'alerts' && <OtherScreen screenName="Alertas" />}
+          {currentScreen === 'config' && <OtherScreen screenName="Configuración" />}
+        </div>
+
+        {/* Panel lateral derecho de navegación */}
+        <div className="w-64 bg-white border-2 border-gray-200 rounded-xl shadow-lg p-4">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Pantallas</h3>
+          <div className="space-y-2">
+            {screens.map((screen) => {
+              const IconComponent = screen.icon;
+              return (
+                <button
+                  key={screen.id}
+                  onClick={() => setCurrentScreen(screen.id)}
+                  className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
+                    currentScreen === screen.id
+                      ? 'bg-blue-500 text-white shadow-md'
+                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <IconComponent className="w-5 h-5" />
+                  <span className="font-medium">{screen.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MonitoringSystem;
