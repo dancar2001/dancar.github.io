@@ -1,222 +1,298 @@
-import React, { useState, useEffect } from 'react';
-import { Thermometer, Droplets, Sun, Monitor, Settings, BarChart3, Activity } from 'lucide-react';
-
-const MonitoringSystem = () => {
-  const [currentScreen, setCurrentScreen] = useState('main');
-  const [data, setData] = useState({
-    temperature: 23.5,
-    humidity: 65.2,
-    radiation: 850.3,
-    timestamp: new Date()
-  });
-
-  // Simular actualización de datos cada 5 segundos
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setData(prev => ({
-        temperature: (20 + Math.random() * 10).toFixed(1),
-        humidity: (50 + Math.random() * 30).toFixed(1),
-        radiation: (700 + Math.random() * 400).toFixed(1),
-        timestamp: new Date()
-      }));
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const screens = [
-    { id: 'main', name: 'Principal', icon: Monitor },
-    { id: 'charts', name: 'Gráficos', icon: BarChart3 },
-    { id: 'alerts', name: 'Alertas', icon: Activity },
-    { id: 'config', name: 'Configuración', icon: Settings }
-  ];
-
-  const getStatusColor = (value, type) => {
-    if (type === 'temperature') {
-      if (value < 15 || value > 35) return 'text-red-500';
-      if (value < 18 || value > 30) return 'text-yellow-500';
-      return 'text-green-500';
-    }
-    if (type === 'humidity') {
-      if (value < 30 || value > 80) return 'text-red-500';
-      if (value < 40 || value > 70) return 'text-yellow-500';
-      return 'text-green-500';
-    }
-    if (type === 'radiation') {
-      if (value > 1200) return 'text-red-500';
-      if (value > 1000) return 'text-yellow-500';
-      return 'text-green-500';
-    }
-    return 'text-gray-600';
-  };
-
-  const MainScreen = () => (
-    <div className="space-y-8">
-      {/* Variables principales */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Temperatura */}
-        <div className="bg-gradient-to-br from-red-50 to-red-100 border-2 border-red-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-red-500 rounded-lg">
-                <Thermometer className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800">Temperatura</h3>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Monitoreo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-temp {
+            background: linear-gradient(135deg, #fef2f2, #fecaca);
+            border: 2px solid #fca5a5;
+        }
+        .gradient-humidity {
+            background: linear-gradient(135deg, #eff6ff, #bfdbfe);
+            border: 2px solid #93c5fd;
+        }
+        .gradient-radiation {
+            background: linear-gradient(135deg, #fffbeb, #fde68a);
+            border: 2px solid #fcd34d;
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header superior con variables -->
+    <div class="bg-white shadow-md border-b-2 border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800">Sistema de Monitoreo</h1>
+                
+                <!-- Variables en el header -->
+                <div class="flex space-x-6">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-red-500">🌡️</span>
+                        <span class="text-sm font-medium text-gray-700" id="header-temp">
+                            23.5°C
+                        </span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-blue-500">💧</span>
+                        <span class="text-sm font-medium text-gray-700" id="header-humidity">
+                            65.2%
+                        </span>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-yellow-500">☀️</span>
+                        <span class="text-sm font-medium text-gray-700" id="header-radiation">
+                            850.3 W/m²
+                        </span>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div className="text-center">
-            <div className={`text-4xl font-bold mb-2 ${getStatusColor(data.temperature, 'temperature')}`}>
-              {data.temperature}°C
-            </div>
-            <div className="text-sm text-gray-600">
-              Rango normal: 18-30°C
-            </div>
-          </div>
         </div>
-
-        {/* Humedad */}
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-blue-500 rounded-lg">
-                <Droplets className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800">Humedad Relativa</h3>
-            </div>
-          </div>
-          <div className="text-center">
-            <div className={`text-4xl font-bold mb-2 ${getStatusColor(data.humidity, 'humidity')}`}>
-              {data.humidity}%
-            </div>
-            <div className="text-sm text-gray-600">
-              Rango normal: 40-70%
-            </div>
-          </div>
-        </div>
-
-        {/* Radiación Solar */}
-        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-200 rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-yellow-500 rounded-lg">
-                <Sun className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-800">Radiación Solar</h3>
-            </div>
-          </div>
-          <div className="text-center">
-            <div className={`text-4xl font-bold mb-2 ${getStatusColor(data.radiation, 'radiation')}`}>
-              {data.radiation}
-            </div>
-            <div className="text-xs text-gray-600 mb-1">W/m²</div>
-            <div className="text-sm text-gray-600">
-              Máximo seguro: 1000 W/m²
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Panel de información adicional */}
-      <div className="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-lg">
-        <h3 className="text-xl font-semibold text-gray-800 mb-4">Estado del Sistema</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-            <span className="text-gray-700">Última actualización:</span>
-            <span className="font-semibold text-gray-900">
-              {data.timestamp.toLocaleTimeString()}
-            </span>
-          </div>
-          <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-            <span className="text-gray-700">Estado general:</span>
-            <span className="font-semibold text-green-600">NORMAL</span>
-          </div>
-        </div>
-      </div>
     </div>
-  );
 
-  const OtherScreen = ({ screenName }) => (
-    <div className="flex items-center justify-center h-96 bg-gray-100 rounded-xl border-2 border-gray-200">
-      <div className="text-center">
-        <div className="text-6xl text-gray-400 mb-4">🚧</div>
-        <h2 className="text-2xl font-semibold text-gray-700 mb-2">
-          Pantalla de {screenName}
-        </h2>
-        <p className="text-gray-600">
-          Esta pantalla está en desarrollo
-        </p>
-      </div>
-    </div>
-  );
+    <div class="max-w-7xl mx-auto p-4 flex gap-6">
+        <!-- Contenido principal -->
+        <div class="flex-1">
+            <!-- Pantalla Principal -->
+            <div id="main-screen" class="space-y-8">
+                <!-- Variables principales -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Temperatura -->
+                    <div class="gradient-temp rounded-xl p-6 shadow-lg card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-3 bg-red-500 rounded-lg">
+                                    <span class="text-white text-xl">🌡️</span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-800">Temperatura</h3>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl font-bold mb-2 text-green-500" id="temp-value">
+                                23.5°C
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                Rango normal: 18-30°C
+                            </div>
+                        </div>
+                    </div>
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header superior con variables */}
-      <div className="bg-white shadow-md border-b-2 border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-800">Sistema de Monitoreo</h1>
-            
-            {/* Variables en el header */}
-            <div className="flex space-x-6">
-              <div className="flex items-center space-x-2">
-                <Thermometer className="w-5 h-5 text-red-500" />
-                <span className="text-sm font-medium text-gray-700">
-                  {data.temperature}°C
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Droplets className="w-5 h-5 text-blue-500" />
-                <span className="text-sm font-medium text-gray-700">
-                  {data.humidity}%
-                </span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Sun className="w-5 h-5 text-yellow-500" />
-                <span className="text-sm font-medium text-gray-700">
-                  {data.radiation} W/m²
-                </span>
-              </div>
+                    <!-- Humedad -->
+                    <div class="gradient-humidity rounded-xl p-6 shadow-lg card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-3 bg-blue-500 rounded-lg">
+                                    <span class="text-white text-xl">💧</span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-800">Humedad Relativa</h3>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl font-bold mb-2 text-green-500" id="humidity-value">
+                                65.2%
+                            </div>
+                            <div class="text-sm text-gray-600">
+                                Rango normal: 40-70%
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Radiación Solar -->
+                    <div class="gradient-radiation rounded-xl p-6 shadow-lg card-hover">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-3">
+                                <div class="p-3 bg-yellow-500 rounded-lg">
+                                    <span class="text-white text-xl">☀️</span>
+                                </div>
+                                <h3 class="text-lg font-semibold text-gray-800">Radiación Solar</h3>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-4xl font-bold mb-2 text-green-500" id="radiation-value">
+                                850.3
+                            </div>
+                            <div class="text-xs text-gray-600 mb-1">W/m²</div>
+                            <div class="text-sm text-gray-600">
+                                Máximo seguro: 1000 W/m²
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de información adicional -->
+                <div class="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-lg">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Estado del Sistema</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700">Última actualización:</span>
+                            <span class="font-semibold text-gray-900" id="last-update">--:--:--</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span class="text-gray-700">Estado general:</span>
+                            <span class="font-semibold text-green-600" id="system-status">NORMAL</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      <div className="max-w-7xl mx-auto p-4 flex gap-6">
-        {/* Contenido principal */}
-        <div className="flex-1">
-          {currentScreen === 'main' && <MainScreen />}
-          {currentScreen === 'charts' && <OtherScreen screenName="Gráficos" />}
-          {currentScreen === 'alerts' && <OtherScreen screenName="Alertas" />}
-          {currentScreen === 'config' && <OtherScreen screenName="Configuración" />}
+            <!-- Otras pantallas -->
+            <div id="charts-screen" class="hidden">
+                <div class="flex items-center justify-center h-96 bg-gray-100 rounded-xl border-2 border-gray-200">
+                    <div class="text-center">
+                        <div class="text-6xl text-gray-400 mb-4">📊</div>
+                        <h2 class="text-2xl font-semibold text-gray-700 mb-2">
+                            Pantalla de Gráficos
+                        </h2>
+                        <p class="text-gray-600">
+                            Esta pantalla está en desarrollo
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="alerts-screen" class="hidden">
+                <div class="flex items-center justify-center h-96 bg-gray-100 rounded-xl border-2 border-gray-200">
+                    <div class="text-center">
+                        <div class="text-6xl text-gray-400 mb-4">🚨</div>
+                        <h2 class="text-2xl font-semibold text-gray-700 mb-2">
+                            Pantalla de Alertas
+                        </h2>
+                        <p class="text-gray-600">
+                            Esta pantalla está en desarrollo
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="config-screen" class="hidden">
+                <div class="flex items-center justify-center h-96 bg-gray-100 rounded-xl border-2 border-gray-200">
+                    <div class="text-center">
+                        <div class="text-6xl text-gray-400 mb-4">⚙️</div>
+                        <h2 class="text-2xl font-semibold text-gray-700 mb-2">
+                            Pantalla de Configuración
+                        </h2>
+                        <p class="text-gray-600">
+                            Esta pantalla está en desarrollo
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        {/* Panel lateral derecho de navegación */}
-        <div className="w-64 bg-white border-2 border-gray-200 rounded-xl shadow-lg p-4">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4">Pantallas</h3>
-          <div className="space-y-2">
-            {screens.map((screen) => {
-              const IconComponent = screen.icon;
-              return (
-                <button
-                  key={screen.id}
-                  onClick={() => setCurrentScreen(screen.id)}
-                  className={`w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 ${
-                    currentScreen === screen.id
-                      ? 'bg-blue-500 text-white shadow-md'
-                      : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  <IconComponent className="w-5 h-5" />
-                  <span className="font-medium">{screen.name}</span>
+        <!-- Panel lateral derecho de navegación -->
+        <div class="w-64 bg-white border-2 border-gray-200 rounded-xl shadow-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">Pantallas</h3>
+            <div class="space-y-2">
+                <button onclick="showScreen('main')" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 bg-blue-500 text-white shadow-md" data-screen="main">
+                    <span>📺</span>
+                    <span class="font-medium">Principal</span>
                 </button>
-              );
-            })}
-          </div>
+                <button onclick="showScreen('charts')" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 bg-gray-50 text-gray-700 hover:bg-gray-100" data-screen="charts">
+                    <span>📊</span>
+                    <span class="font-medium">Gráficos</span>
+                </button>
+                <button onclick="showScreen('alerts')" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 bg-gray-50 text-gray-700 hover:bg-gray-100" data-screen="alerts">
+                    <span>🚨</span>
+                    <span class="font-medium">Alertas</span>
+                </button>
+                <button onclick="showScreen('config')" class="nav-btn w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 bg-gray-50 text-gray-700 hover:bg-gray-100" data-screen="config">
+                    <span>⚙️</span>
+                    <span class="font-medium">Configuración</span>
+                </button>
+            </div>
         </div>
-      </div>
     </div>
-  );
-};
 
-export default MonitoringSystem;
+    <script>
+        let currentData = {
+            temperature: 23.5,
+            humidity: 65.2,
+            radiation: 850.3
+        };
+
+        function getStatusColor(value, type) {
+            if (type === 'temperature') {
+                if (value < 15 || value > 35) return 'text-red-500';
+                if (value < 18 || value > 30) return 'text-yellow-500';
+                return 'text-green-500';
+            }
+            if (type === 'humidity') {
+                if (value < 30 || value > 80) return 'text-red-500';
+                if (value < 40 || value > 70) return 'text-yellow-500';
+                return 'text-green-500';
+            }
+            if (type === 'radiation') {
+                if (value > 1200) return 'text-red-500';
+                if (value > 1000) return 'text-yellow-500';
+                return 'text-green-500';
+            }
+            return 'text-gray-600';
+        }
+
+        function updateData() {
+            // Simular nuevos datos
+            currentData.temperature = (20 + Math.random() * 10).toFixed(1);
+            currentData.humidity = (50 + Math.random() * 30).toFixed(1);
+            currentData.radiation = (700 + Math.random() * 400).toFixed(1);
+
+            // Actualizar valores en pantalla
+            const tempEl = document.getElementById('temp-value');
+            const humidityEl = document.getElementById('humidity-value');
+            const radiationEl = document.getElementById('radiation-value');
+
+            tempEl.textContent = currentData.temperature + '°C';
+            humidityEl.textContent = currentData.humidity + '%';
+            radiationEl.textContent = currentData.radiation;
+
+            // Actualizar colores según estado
+            tempEl.className = 'text-4xl font-bold mb-2 ' + getStatusColor(currentData.temperature, 'temperature');
+            humidityEl.className = 'text-4xl font-bold mb-2 ' + getStatusColor(currentData.humidity, 'humidity');
+            radiationEl.className = 'text-4xl font-bold mb-2 ' + getStatusColor(currentData.radiation, 'radiation');
+
+            // Actualizar header
+            document.getElementById('header-temp').textContent = currentData.temperature + '°C';
+            document.getElementById('header-humidity').textContent = currentData.humidity + '%';
+            document.getElementById('header-radiation').textContent = currentData.radiation + ' W/m²';
+
+            // Actualizar timestamp
+            document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+        }
+
+        function showScreen(screenName) {
+            // Ocultar todas las pantallas
+            const screens = ['main', 'charts', 'alerts', 'config'];
+            screens.forEach(screen => {
+                document.getElementById(screen + '-screen').classList.add('hidden');
+            });
+
+            // Mostrar la pantalla seleccionada
+            document.getElementById(screenName + '-screen').classList.remove('hidden');
+
+            // Actualizar botones de navegación
+            const navButtons = document.querySelectorAll('.nav-btn');
+            navButtons.forEach(btn => {
+                if (btn.dataset.screen === screenName) {
+                    btn.className = 'nav-btn w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 bg-blue-500 text-white shadow-md';
+                } else {
+                    btn.className = 'nav-btn w-full flex items-center space-x-3 p-3 rounded-lg transition-all duration-200 bg-gray-50 text-gray-700 hover:bg-gray-100';
+                }
+            });
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            updateData();
+            setInterval(updateData, 5000); // Actualizar cada 5 segundos
+        });
+    </script>
+</body>
+</html>
